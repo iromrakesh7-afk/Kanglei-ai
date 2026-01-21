@@ -8,6 +8,10 @@ This contains everything you need to run your app locally.
 
 View your app in AI Studio: https://ai.studio/apps/drive/1lH5cOxLlJ1aEZj8iXc-QcYukHy0UJ-qS
 
+Website: https://l1nk.dev/Kangleiai
+
+website: https://beacons.ai/perplexityai
+
 ## Run Locally
 
 **Prerequisites:**  Node.js
