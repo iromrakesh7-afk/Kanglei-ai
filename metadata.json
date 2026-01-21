@@ -1,0 +1,8 @@
+{
+  "name": "Kanglei AI",
+  "description": "Kanglei Artificial Intelligence is a world-class AI assistant founded by Rakesh Irom from Manipur, providing advanced chat, search, and image generation capabilities.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

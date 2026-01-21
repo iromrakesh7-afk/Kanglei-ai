@@ -1,0 +1,25 @@
+
+{
+  "short_name": "Kanglei AI",
+  "name": "Kanglei Artificial Intelligence",
+  "icons": [
+    {
+      "src": "https://images.squarespace-cdn.com/content/v1/6604107844089e504c35e364/1103c004-7128-44e2-97be-21db33f26cf9/KA+logo+02+PNG.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://images.squarespace-cdn.com/content/v1/6604107844089e504c35e364/1103c004-7128-44e2-97be-21db33f26cf9/KA+logo+02+PNG.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#020617",
+  "background_color": "#020617",
+  "orientation": "portrait",
+  "scope": "/",
+  "description": "Advanced AI Assistant founded by Rakesh Irom."
+}
