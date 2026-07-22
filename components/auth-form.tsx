@@ -49,6 +49,14 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
       return
     }
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address')
+      setLoading(false)
+      return
+    }
+
     if (isSignUp && !name) {
       setError('Name is required for sign up')
       setLoading(false)
@@ -72,17 +80,24 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
 
       if (result.error) {
         console.error('[v0] Auth error:', result.error)
-        const errorMessage = result.error.message ?? 'Authentication failed'
+        let errorMessage = result.error.message ?? 'Authentication failed'
+        
+        // Provide better error messages
+        if (errorMessage.includes('Invalid') || errorMessage.includes('invalid')) {
+          if (isSignUp) {
+            errorMessage = 'Unable to create account. Please check your email and password.'
+          } else {
+            errorMessage = 'Email or password is incorrect. Please try again.'
+          }
+        }
+        
         setError(errorMessage)
         setLoading(false)
         return
       }
 
-      console.log('[v0] Auth successful, refreshing and redirecting to /chat')
-      // First refresh to get the new session
-      router.refresh()
-      // Small delay to ensure session is available
-      await new Promise(resolve => setTimeout(resolve, 500))
+      console.log('[v0] Auth successful, redirecting to /chat')
+      // Redirect immediately after successful auth
       router.push('/chat')
     } catch (err) {
       console.error('[v0] Auth exception:', err)
@@ -93,7 +108,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   }
 
   return (
-    <main className="min-h-svh bg-slate-950 flex items-center justify-center px-4">
+    <main className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
       <Card className="w-full max-w-sm p-8 bg-slate-900 border-green-500 border-2">
         <div className="flex justify-center mb-6">
           <img src="/kanglei-logo.png" alt="Kanglei AI" className="h-16 w-16" />
