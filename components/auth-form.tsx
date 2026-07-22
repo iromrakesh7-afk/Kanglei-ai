@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
-import { Chrome } from 'lucide-react'
+import { Mail } from 'lucide-react'
 
 export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const router = useRouter()
@@ -182,7 +182,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
             disabled={loading}
             className="w-full bg-white hover:bg-gray-100 text-gray-900 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
           >
-            <Chrome size={18} />
+            <Mail size={18} />
             Google
           </Button>
         </form>
