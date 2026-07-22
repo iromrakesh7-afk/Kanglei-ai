@@ -1,6 +1,5 @@
 import { betterAuth } from 'better-auth'
 import { pool } from '@/lib/db'
-import { oauth2 } from 'better-auth/oauth2'
 
 // Ensure required environment variables are set
 if (!process.env.DATABASE_URL) {
@@ -28,16 +27,6 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: true,
   },
-  plugins: [
-    oauth2({
-      providers: {
-        google: {
-          clientId: process.env.GOOGLE_CLIENT_ID || '',
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-        },
-      },
-    }),
-  ],
   trustedOrigins: [
     'http://localhost:3000',
     'http://localhost:3001',
