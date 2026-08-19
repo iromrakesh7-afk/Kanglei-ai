@@ -97,8 +97,9 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         return
       }
 
-      console.log('[v0] Auth successful, redirecting to /chat')
-      // Redirect immediately after successful auth
+      console.log('[v0] Auth successful, refreshing session before redirect')
+      router.refresh()
+      await new Promise((resolve) => setTimeout(resolve, 500))
       router.push('/chat')
     } catch (err) {
       console.error('[v0] Auth exception:', err)
