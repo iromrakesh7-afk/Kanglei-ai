@@ -1,6 +1,10 @@
 import { betterAuth } from 'better-auth'
 import { pool } from '@/lib/db'
 
+function normalizeBaseURL(value: string) {
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`
+}
+
 // Ensure required environment variables are set
 if (!process.env.DATABASE_URL) {
   throw new Error('[v0] DATABASE_URL is not set - authentication will not work')
@@ -16,13 +20,14 @@ if (!process.env.BETTER_AUTH_SECRET) {
 export const auth = betterAuth({
   database: pool,
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL:
-    process.env.BETTER_AUTH_URL ??
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.V0_RUNTIME_URL ?? 'http://localhost:3000'),
+  baseURL: normalizeBaseURL(
+    process.env.BETTER_AUTH_URL ||
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : process.env.V0_RUNTIME_URL || 'http://localhost:3000'),
+  ),
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
