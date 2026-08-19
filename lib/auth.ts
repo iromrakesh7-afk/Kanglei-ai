@@ -2,7 +2,12 @@ import { betterAuth } from 'better-auth'
 import { pool } from '@/lib/db'
 
 function normalizeBaseURL(value: string) {
-  return /^https?:\/\//i.test(value) ? value : `https://${value}`
+  const trimmed = value.trim()
+  const withProtocol = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`
+
+  return new URL(withProtocol).origin
 }
 
 // Ensure required environment variables are set
@@ -40,7 +45,9 @@ export const auth = betterAuth({
     'https://kangleiai.in',
     'http://www.kangleiai.in',
     'https://www.kangleiai.in',
-    ...(process.env.V0_RUNTIME_URL ? [process.env.V0_RUNTIME_URL] : []),
+    'https://kangleiai.site',
+    'https://www.kangleiai.site',
+    ...(process.env.V0_RUNTIME_URL ? [normalizeBaseURL(process.env.V0_RUNTIME_URL)] : []),
     ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
     ...(process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`]

@@ -1,7 +1,12 @@
 import { createAuthClient } from 'better-auth/react'
 
 function normalizeBaseURL(value: string) {
-  return /^https?:\/\//i.test(value) ? value : `https://${value}`
+  const trimmed = value.trim()
+  const withProtocol = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`
+
+  return new URL(withProtocol).origin
 }
 
 const configuredBaseURL =
