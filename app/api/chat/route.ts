@@ -23,7 +23,10 @@ export async function POST(req: Request) {
     const groqModel = model.startsWith('groq/') ? model.replace('groq/', '') : model
     console.log('[v0] Using Groq model:', groqModel)
     console.log('[v0] Language:', language)
-    console.log('[v0] GROQ_API_KEY is set:', !!process.env.GROQ_API_KEY)
+    const groqApiKey = process.env.GROQ_API_KEY_2
+    if (!groqApiKey) {
+      return Response.json({ error: 'Groq API key is not configured' }, { status: 500 })
+    }
 
     let systemPrompt: string
 
@@ -60,7 +63,7 @@ Help users with their queries, research, coding, writing, analysis, creative tas
 
     // Use Groq SDK directly for real responses
     const result = await generateText({
-      model: groq(groqModel),
+      model: groq(groqModel, { apiKey: groqApiKey }),
       system: systemPrompt,
       messages: messages.map((msg: any) => ({
         role: msg.role,
