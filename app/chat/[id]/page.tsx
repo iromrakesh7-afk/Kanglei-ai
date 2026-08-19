@@ -43,11 +43,10 @@ export default async function ChatDetailPage({ params }: ChatPageProps) {
     redirect('/chat')
   }
 
-  // Use valid Groq model, fallback to default if stored model is invalid or decommissioned
-  const validModel = 
-    conversation.model && conversation.model.startsWith('groq/') && !conversation.model.includes('mixtral') && !conversation.model.includes('llama-3.1') && !conversation.model.includes('llama-2')
-      ? conversation.model
-      : 'groq/llama-3.3-70b-versatile'
+  // Use a currently available Groq model, falling back when an older model is stored.
+  const validModel = conversation.model === 'openai/gpt-oss-120b'
+    ? conversation.model
+    : 'openai/gpt-oss-120b'
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden max-h-screen">

@@ -26,8 +26,9 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
 
     try {
       console.log('[v0] Starting Google OAuth')
-      await authClient.signIn.oauth2({
+      await authClient.signIn.social({
         provider: 'google',
+        callbackURL: '/chat',
       })
     } catch (err) {
       console.error('[v0] Google OAuth error:', err)

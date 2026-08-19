@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       return new Response('Unauthorized', { status: 401 })
     }
 
-    let { messages, model = 'groq/llama-3.3-70b-versatile', language = 'en', useSearch = false } = await req.json()
+    let { messages, model = 'openai/gpt-oss-120b', language = 'en', useSearch = false } = await req.json()
 
     if (!messages || !Array.isArray(messages)) {
       return new Response('Invalid messages format', { status: 400 })

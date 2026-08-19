@@ -13,7 +13,7 @@ async function getUserId() {
   return session.user.id
 }
 
-export async function createConversation(title: string = 'New Chat', model: string = 'groq/llama-3.3-70b-versatile') {
+export async function createConversation(title: string = 'New Chat', model: string = 'openai/gpt-oss-120b') {
   const userId = await getUserId()
   const id = `conv-${Date.now()}`
   
