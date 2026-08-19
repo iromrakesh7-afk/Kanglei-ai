@@ -28,10 +28,10 @@ interface ChatInterfaceProps {
 }
 
 const AVAILABLE_MODELS = [
-  { id: 'kanglei-lite', apiModel: 'groq/llama-3.3-70b-versatile', name: 'Kanglei Lite', provider: 'Kanglei', lang: 'en', disabled: false },
-  { id: 'kanglei-pro', apiModel: 'groq/llama-3.3-70b-versatile', name: 'Kanglei Pro', provider: 'Kanglei', lang: 'en', disabled: false },
-  { id: 'kanglei-ultra', apiModel: 'groq/llama-3.3-70b-versatile', name: 'Kanglei Ultra', provider: 'Kanglei', lang: 'en', disabled: false },
-  { id: 'meiteilon-kanglei', apiModel: 'groq/llama-3.3-70b-versatile', name: 'Meiteilon Kanglei (Coming Soon)', provider: 'Kanglei', lang: 'meiteilon', disabled: true },
+  { id: 'kanglei-lite', apiModel: 'openai/gpt-oss-120b', name: 'Kanglei Lite', provider: 'Kanglei', lang: 'en', disabled: false },
+  { id: 'kanglei-pro', apiModel: 'openai/gpt-oss-120b', name: 'Kanglei Pro', provider: 'Kanglei', lang: 'en', disabled: false },
+  { id: 'kanglei-ultra', apiModel: 'openai/gpt-oss-120b', name: 'Kanglei Ultra', provider: 'Kanglei', lang: 'en', disabled: false },
+  { id: 'meiteilon-kanglei', apiModel: 'openai/gpt-oss-120b', name: 'Meiteilon Kanglei (Coming Soon)', provider: 'Kanglei', lang: 'meiteilon', disabled: true },
 ]
 
 export function ChatInterface({
@@ -229,15 +229,21 @@ export function ChatInterface({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: newMessages,
-          model: selectedModelData?.apiModel || 'groq/llama-3.3-70b-versatile',
+          model: selectedModelData?.apiModel || 'openai/gpt-oss-120b',
           language: selectedLanguage,
           useSearch: false,
         }),
       })
 
-      if (!response.ok) throw new Error('Failed to get response')
+      const data = await response.json().catch(() => null)
+      if (!response.ok) {
+        throw new Error(data?.error || `Request failed (${response.status})`)
+      }
 
-      const data = await response.json()
+      if (!data?.content) {
+        throw new Error('The AI returned an empty response')
+      }
+
       const assistantMessage: Message = {
         role: 'assistant',
         content: data.content,

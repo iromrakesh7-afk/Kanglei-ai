@@ -58,7 +58,7 @@ export const conversation = pgTable('conversation', {
   id: text('id').primaryKey(),
   userId: text('userId').notNull().references(() => user.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
-  model: text('model').notNull().default('groq/llama-3.3-70b-versatile'),
+  model: text('model').notNull().default('openai/gpt-oss-120b'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })

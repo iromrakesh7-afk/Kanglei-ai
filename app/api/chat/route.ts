@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       return new Response('Unauthorized', { status: 401 })
     }
 
-    let { messages, model = 'groq/llama-3.3-70b-versatile', language = 'en', useSearch = false } = await req.json()
+    let { messages, model = 'openai/gpt-oss-120b', language = 'en', useSearch = false } = await req.json()
 
     if (!messages || !Array.isArray(messages)) {
       return new Response('Invalid messages format', { status: 400 })
@@ -23,7 +23,10 @@ export async function POST(req: Request) {
     const groqModel = model.startsWith('groq/') ? model.replace('groq/', '') : model
     console.log('[v0] Using Groq model:', groqModel)
     console.log('[v0] Language:', language)
-    console.log('[v0] GROQ_API_KEY is set:', !!process.env.GROQ_API_KEY)
+    const groqApiKey = process.env.GROQ_API_KEY_2
+    if (!groqApiKey) {
+      return Response.json({ error: 'Groq API key is not configured' }, { status: 500 })
+    }
 
     let systemPrompt: string
 
@@ -49,24 +52,36 @@ Format examples (WRONG - NEVER do this):
     } else {
       // English versions (Kanglei Lite, Pro, Ultra)
       systemPrompt = useSearch
-        ? `You are Kanglei AI, a powerful artificial intelligence assistant founded by Rakesh Irom. 
-You have access to real-time web search capabilities to provide the most current and accurate information.
-Help users with their queries, research, coding, writing, analysis, and much more.
-When the user asks about current events or recent information, use your search capabilities.`
-        : `You are Kanglei AI, a powerful artificial intelligence assistant founded by Rakesh Irom.
-You are as capable as ChatGPT, Gemini, Claude, and Perplexity combined.
-Help users with their queries, research, coding, writing, analysis, creative tasks, and much more.`
+        ? `You are Kanglei AI, a precise and reliable assistant.
+Answer the user's exact question directly and stay focused on the requested topic.
+Use only information you are confident is correct. Never invent facts, sources, links, quotations, names, dates, or numbers.
+If the question is ambiguous, ask one concise clarifying question instead of guessing.
+If you do not know or cannot verify something, say so clearly.
+For current or changing information, state the relevant date and avoid presenting outdated information as fact.
+For calculations, reason carefully and show the essential steps.
+For coding, provide working code and address the user's actual error or requirement.
+Use concise structure with short paragraphs or bullets when helpful.
+You have access to real-time web search capabilities when available; do not claim that you searched unless you actually did.`
+        : `You are Kanglei AI, a precise and reliable assistant.
+Answer the user's exact question directly, completely, and concisely.
+Stay focused on the user's request; do not add unrelated background, marketing language, or exaggerated claims.
+Use only information you are confident is correct. Never invent facts, sources, links, quotations, names, dates, or numbers.
+If the question is ambiguous, ask one concise clarifying question instead of guessing.
+If you do not know or cannot verify something, say so clearly rather than hallucinating.
+For calculations, reason carefully and show the essential steps.
+For coding, provide working code and address the user's actual error or requirement.
+Use concise structure with short paragraphs or bullets when helpful.`
     }
 
     // Use Groq SDK directly for real responses
     const result = await generateText({
-      model: groq(groqModel),
+      model: groq(groqModel, { apiKey: groqApiKey }),
       system: systemPrompt,
       messages: messages.map((msg: any) => ({
         role: msg.role,
         content: msg.content,
       })),
-      temperature: 0.7,
+      temperature: 0.2,
     })
 
     return Response.json({
