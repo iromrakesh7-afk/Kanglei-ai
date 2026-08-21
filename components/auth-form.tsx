@@ -108,10 +108,10 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
-      <Card className="w-full max-w-sm p-8 bg-slate-900 border-green-500 border-2">
+    <main className="min-h-screen bg-background flex items-center justify-center px-4">
+      <Card className="w-full max-w-sm p-8 bg-card border-border shadow-lg">
         <div className="flex justify-center mb-6">
-          <img src="/kanglei-logo.png" alt="Kanglei AI" className="h-16 w-16" />
+          <img src="/kanglei-new-logo.png" alt="Kanglei AI" className="h-16 w-16" />
         </div>
         <div className="mb-6 text-center">
           <h1 className="text-3xl font-bold tracking-tight text-white">
