@@ -49,39 +49,39 @@
 }
 
 :root {
-  color-scheme: dark;
-  --background: #0f0f0f;
-  --foreground: #ffffff;
-  --card: #1a1a1a;
-  --card-foreground: #ffffff;
-  --popover: #1a1a1a;
-  --popover-foreground: #ffffff;
-  --primary: #00FF88;
-  --primary-foreground: #0f0f0f;
-  --secondary: #1a1a1a;
-  --secondary-foreground: #ffffff;
-  --muted: #333333;
-  --muted-foreground: #888888;
-  --accent: #00FF88;
-  --accent-foreground: #0f0f0f;
-  --destructive: #ff4444;
-  --border: #333333;
-  --input: #1a1a1a;
-  --ring: #00FF88;
-  --chart-1: #00FF88;
-  --chart-2: #00DD99;
-  --chart-3: #00CCAA;
-  --chart-4: #00BBBB;
-  --chart-5: #00AACC;
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #1e293b;
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
+  --accent: #e0f2fe;
+  --accent-foreground: #1e3a8a;
+  --destructive: #dc2626;
+  --border: #e2e8f0;
+  --input: #ffffff;
+  --ring: #2563eb;
+  --chart-1: #2563eb;
+  --chart-2: #0ea5e9;
+  --chart-3: #06b6d4;
+  --chart-4: #8b5cf6;
+  --chart-5: #f59e0b;
   --radius: 0.625rem;
-  --sidebar: #0f0f0f;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #00FF88;
-  --sidebar-primary-foreground: #0f0f0f;
-  --sidebar-accent: #00FF88;
-  --sidebar-accent-foreground: #0f0f0f;
-  --sidebar-border: #333333;
-  --sidebar-ring: #00FF88;
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #111827;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e0f2fe;
+  --sidebar-accent-foreground: #1e3a8a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #2563eb;
 }
 
 
@@ -96,7 +96,7 @@
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
     padding-bottom: env(safe-area-inset-bottom);
-    background: linear-gradient(180deg, #000000 0%, #080a18 40%, #12162D 100%);
+    background: var(--background);
     min-height: 100vh;
   }
   body {

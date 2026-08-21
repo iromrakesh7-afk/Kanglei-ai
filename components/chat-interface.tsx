@@ -28,10 +28,10 @@ interface ChatInterfaceProps {
 }
 
 const AVAILABLE_MODELS = [
-  { id: 'kanglei-lite', apiModel: 'groq/llama-3.3-70b-versatile', name: 'Kanglei Lite', provider: 'Kanglei', lang: 'en', disabled: false },
-  { id: 'kanglei-pro', apiModel: 'groq/llama-3.3-70b-versatile', name: 'Kanglei Pro', provider: 'Kanglei', lang: 'en', disabled: false },
-  { id: 'kanglei-ultra', apiModel: 'groq/llama-3.3-70b-versatile', name: 'Kanglei Ultra', provider: 'Kanglei', lang: 'en', disabled: false },
-  { id: 'meiteilon-kanglei', apiModel: 'groq/llama-3.3-70b-versatile', name: 'Meiteilon Kanglei (Coming Soon)', provider: 'Kanglei', lang: 'meiteilon', disabled: true },
+  { id: 'kanglei-lite', apiModel: 'groq/openai/gpt-oss-120b', name: 'Kanglei Lite', provider: 'Kanglei', lang: 'en', disabled: false },
+  { id: 'kanglei-pro', apiModel: 'groq/openai/gpt-oss-120b', name: 'Kanglei Pro', provider: 'Kanglei', lang: 'en', disabled: false },
+  { id: 'kanglei-ultra', apiModel: 'groq/openai/gpt-oss-120b', name: 'Kanglei Ultra', provider: 'Kanglei', lang: 'en', disabled: false },
+  { id: 'meiteilon-kanglei', apiModel: 'groq/openai/gpt-oss-120b', name: 'Meiteilon Kanglei (Coming Soon)', provider: 'Kanglei', lang: 'meiteilon', disabled: true },
 ]
 
 export function ChatInterface({
@@ -229,15 +229,17 @@ export function ChatInterface({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: newMessages,
-          model: selectedModelData?.apiModel || 'groq/llama-3.3-70b-versatile',
+          model: selectedModelData?.apiModel || 'groq/openai/gpt-oss-120b',
           language: selectedLanguage,
           useSearch: false,
         }),
       })
 
-      if (!response.ok) throw new Error('Failed to get response')
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok || !data.content) {
+        throw new Error(data.error || 'I could not generate an answer right now. Please try again.')
+      }
 
-      const data = await response.json()
       const assistantMessage: Message = {
         role: 'assistant',
         content: data.content,
@@ -276,7 +278,9 @@ export function ChatInterface({
         ...newMessages,
         {
           role: 'assistant',
-          content: 'Sorry, I encountered an error. Please try again.',
+          content: error instanceof Error
+            ? error.message
+            : 'I could not generate an answer right now. Please try again.',
         },
       ])
       setIsAnswering(false)
@@ -305,7 +309,7 @@ export function ChatInterface({
             <div className="flex flex-col items-center gap-2 md:gap-4">
               <div className="w-16 h-16 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-green-500 flex items-center justify-center bg-slate-900 flex-shrink-0">
                 <Image
-                  src="/kanglei-logo.png"
+                  src="/kanglei-new-logo.png"
                   alt="Kanglei AI Logo"
                   width={128}
                   height={128}
@@ -313,7 +317,7 @@ export function ChatInterface({
                 />
               </div>
               <div className="text-center">
-                <h2 className="text-2xl md:text-4xl font-bold text-white mb-1">Kanglei AI</h2>
+                <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-1">Kanglei AI</h2>
                 <p className="text-xs md:text-sm text-gray-400">Founded by Rakesh Irom</p>
               </div>
             </div>
@@ -334,7 +338,7 @@ export function ChatInterface({
                       (document.activeElement as HTMLInputElement)?.blur()
                     }, 0)
                   }}
-                  className="p-3 text-left rounded-lg border border-green-500/30 bg-slate-800/50 hover:bg-slate-800 text-gray-200 hover:text-white hover:border-green-500/60 transition-all text-xs md:text-sm font-medium"
+                  className="p-3 text-left rounded-lg border border-green-500/30 bg-slate-800/50 hover:bg-slate-800 text-foreground hover:text-foreground hover:border-green-500/60 transition-all text-xs md:text-sm font-medium"
                 >
                   {question}
                 </button>
@@ -354,7 +358,7 @@ export function ChatInterface({
                   isAnswering && idx === messages.length - 1 ? 'animate-spin' : ''
                 }`}>
                   <Image
-                    src="/kanglei-logo.png"
+                    src="/kanglei-new-logo.png"
                     alt="Kanglei"
                     width={32}
                     height={32}
@@ -369,7 +373,7 @@ export function ChatInterface({
                 className={`px-2 md:px-4 py-1.5 md:py-3 rounded-lg text-xs md:text-base ${
                   msg.role === 'user'
                     ? 'max-w-xs sm:max-w-md md:max-w-2xl bg-green-500 text-black rounded-br-none font-medium'
-                    : 'w-full bg-transparent text-gray-200 rounded-bl-none'
+                    : 'w-full bg-transparent text-foreground rounded-bl-none'
                 }`}
               >
                 {msg.content.startsWith('[IMAGE_URL:') ? (
@@ -399,7 +403,7 @@ export function ChatInterface({
             <div className="flex-shrink-0 mt-1 hidden sm:block">
               <div className="w-6 h-6 md:w-8 md:h-8 rounded-full overflow-hidden flex items-center justify-center border-2 border-green-500 animate-spin">
                 <Image
-                  src="/kanglei-logo.png"
+                  src="/kanglei-new-logo.png"
                   alt="Kanglei"
                   width={32}
                   height={32}
@@ -407,7 +411,7 @@ export function ChatInterface({
                 />
               </div>
             </div>
-            <div className="w-full bg-transparent text-gray-200 px-3 md:px-4 py-2 md:py-3 rounded-lg rounded-bl-none text-sm md:text-base">
+            <div className="w-full bg-transparent text-foreground px-3 md:px-4 py-2 md:py-3 rounded-lg rounded-bl-none text-sm md:text-base">
               <div className="flex gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
@@ -421,10 +425,10 @@ export function ChatInterface({
       </div>
 
       {/* Modern Minimalist Input Area - Mobile Optimized */}
-      <div ref={inputAreaRef} className="border-t border-green-500/20 bg-slate-950 px-2 lg:px-6 py-2 lg:py-3 flex-shrink-0 transition-all duration-200 flex flex-col gap-2 lg:gap-3">
+      <div ref={inputAreaRef} className="border-t border-border bg-background px-2 lg:px-6 py-3 lg:py-4 flex-shrink-0 transition-all duration-200 flex flex-col gap-2 lg:gap-3">
         <div className="flex flex-col gap-2 lg:gap-3">
           {/* Input Container - Gemini Pro Style */}
-          <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-2.5 transition-all hover:border-white/40">
+          <div className="flex items-center gap-2 bg-card border border-border rounded-[1.75rem] px-3 py-2.5 shadow-sm transition-all focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20 hover:border-ring/60">
             {/* Left: Menu Dropdown */}
             <div className="relative">
               <button 
@@ -436,13 +440,13 @@ export function ChatInterface({
               </button>
 
               {showMenuDropdown && (
-                <div className="absolute bottom-full mb-2 left-0 bg-slate-900 border border-white/30 rounded-lg shadow-2xl z-50 min-w-max max-h-96 overflow-y-auto">
+                <div className="absolute bottom-full mb-2 left-0 bg-card border border-border rounded-xl shadow-lg z-50 min-w-max max-h-96 overflow-y-auto">
                   <button
                     onClick={() => {
                       handleNewChat()
                       setShowMenuDropdown(false)
                     }}
-                    className="block w-full text-left px-4 py-2 text-sm text-white/70 hover:bg-white/10 transition-all border-b border-white/10"
+                    className="block w-full text-left px-4 py-2 text-sm text-foreground/70 hover:bg-muted transition-all border-b border-white/10"
                   >
                     New Chat
                   </button>
@@ -457,7 +461,7 @@ export function ChatInterface({
                           onClick={() => {
                             window.location.href = `/chat/${chat.id}`
                           }}
-                          className="block w-full text-left px-4 py-2 text-xs text-white/60 hover:bg-white/10 transition-all truncate"
+                          className="block w-full text-left px-4 py-2 text-xs text-foreground/60 hover:bg-muted transition-all truncate"
                           title={chat.title}
                         >
                           {chat.title}
@@ -485,7 +489,7 @@ export function ChatInterface({
                       window.location.href = '/settings'
                       setShowMenuDropdown(false)
                     }}
-                    className={`block w-full text-left px-4 py-2 text-sm text-white/70 hover:bg-white/10 transition-all ${isAdmin ? '' : 'border-t border-white/10'}`}
+                    className={`block w-full text-left px-4 py-2 text-sm text-foreground/70 hover:bg-muted transition-all ${isAdmin ? '' : 'border-t border-white/10'}`}
                   >
                     Settings
                   </button>
@@ -497,7 +501,7 @@ export function ChatInterface({
             <div className="relative flex-shrink-0" ref={modelDropdownRef}>
               <button
                 onClick={() => setShowModelDropdown(!showModelDropdown)}
-                className="flex items-center gap-1 text-white/70 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-white/10 transition-all"
+                className="flex items-center gap-1 text-foreground/70 hover:text-foreground text-xs px-2 py-1 rounded-lg hover:bg-muted transition-all"
               >
                 <span className="truncate max-w-12">{selectedModelData?.name || 'K.AI'}</span>
                 <ChevronDown 
@@ -507,7 +511,7 @@ export function ChatInterface({
               </button>
 
               {showModelDropdown && (
-                <div className="absolute bottom-full mb-2 left-0 bg-slate-900 border border-white/30 rounded-lg shadow-2xl z-50 min-w-max">
+                <div className="absolute bottom-full mb-2 left-0 bg-card border border-border rounded-xl shadow-lg z-50 min-w-max">
                   {AVAILABLE_MODELS.map((m, idx) => (
                     <button
                       key={idx}
@@ -524,7 +528,7 @@ export function ChatInterface({
                           ? 'bg-slate-800 text-gray-500 opacity-60'
                           : selectedModel === m.id
                           ? 'bg-green-500/30 text-green-400 font-semibold'
-                          : 'text-white/70 hover:bg-white/10'
+                          : 'text-foreground/70 hover:bg-muted'
                       }`}
                     >
                       {m.name}
@@ -540,7 +544,7 @@ export function ChatInterface({
               className={`p-1.5 rounded-lg transition-all ${
                 isListening
                   ? 'bg-red-500/20 text-red-400'
-                  : 'text-white/70 hover:text-white'
+                  : 'text-foreground/70 hover:text-foreground'
               }`}
               title={isListening ? 'Stop listening' : 'Start voice input'}
             >
@@ -560,14 +564,14 @@ export function ChatInterface({
               }}
               placeholder="Ask Kanglei"
               disabled={loading}
-              className="flex-1 min-w-0 bg-transparent text-sm text-white placeholder-white/50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 min-w-0 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             />
 
             {/* Right: Send Button */}
             <Button
               onClick={handleSendMessage}
               disabled={loading || !input.trim()}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 h-9 w-9 min-w-9 flex-shrink-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="bg-blue-600 hover:bg-blue-700 text-foreground rounded-full p-2 h-9 w-9 min-w-9 flex-shrink-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               size="sm"
             >
               {loading ? (

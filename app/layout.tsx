@@ -14,13 +14,13 @@ export const metadata: Metadata = {
   description: 'Kanglei AI - A powerful AI assistant with capabilities like ChatGPT, Gemini, Claude, and Perplexity. Founded by Rakesh Irom.',
   generator: 'v0.app',
   icons: {
-    icon: '/logo.png',
-    apple: '/logo.png',
+    icon: '/kanglei-new-logo.png',
+    apple: '/kanglei-new-logo.png',
   },
   openGraph: {
     title: 'Kanglei AI',
     description: 'Advanced AI Assistant founded by Rakesh Irom',
-    images: ['/logo.png'],
+    images: ['/kanglei-new-logo.png'],
   },
   verification: {
     google: 'iLWebto6sxDCoc54ur6bgvQUcbYG3K1Gp0lQ9gD5Xbk',
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
-  themeColor: '#00FF88',
+  colorScheme: 'light',
+  themeColor: '#ffffff',
   width: 'device-width',
   initialScale: 1,
   minimumScale: 1,
@@ -68,14 +68,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} bg-slate-950`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} bg-background`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-sans antialiased bg-slate-950 text-white">
+      <body className="font-sans antialiased bg-background text-foreground">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

@@ -13,17 +13,43 @@ export async function POST(req: Request) {
       return new Response('Unauthorized', { status: 401 })
     }
 
-    let { messages, model = 'groq/llama-3.3-70b-versatile', language = 'en', useSearch = false } = await req.json()
+    const body = await req.json()
+    const { messages, model = 'groq/openai/gpt-oss-120b', language = 'en', useSearch = false } = body
 
-    if (!messages || !Array.isArray(messages)) {
-      return new Response('Invalid messages format', { status: 400 })
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return Response.json({ error: 'Please ask a question before sending.' }, { status: 400 })
     }
 
-    // Remove 'groq/' prefix if present
-    const groqModel = model.startsWith('groq/') ? model.replace('groq/', '') : model
+    const safeMessages = messages
+      .filter((msg: any) =>
+        (msg?.role === 'user' || msg?.role === 'assistant') &&
+        typeof msg?.content === 'string' &&
+        msg.content.trim().length > 0
+      )
+      .slice(-20)
+
+    if (safeMessages.length === 0 || !safeMessages.some((msg: any) => msg.role === 'user')) {
+      return Response.json({ error: 'Please enter a valid question.' }, { status: 400 })
+    }
+
+    // Keep the provider model fixed and known-good instead of trusting client input.
+    const groqModel = 'openai/gpt-oss-120b'
     console.log('[v0] Using Groq model:', groqModel)
     console.log('[v0] Language:', language)
-    console.log('[v0] GROQ_API_KEY is set:', !!process.env.GROQ_API_KEY)
+    const groqApiKeys = [
+      process.env.GROQ_API_KEY,
+      process.env.GROQ_API_KEY_2,
+      process.env.GROQ_API_KEY_3,
+    ].filter((key): key is string => Boolean(key?.trim()))
+
+    if (groqApiKeys.length === 0) {
+      return Response.json(
+        { error: 'No Groq API key is configured.' },
+        { status: 500 },
+      )
+    }
+
+    console.log('[v0] Groq API keys available:', groqApiKeys.length)
 
     let systemPrompt: string
 
@@ -51,23 +77,38 @@ Format examples (WRONG - NEVER do this):
       systemPrompt = useSearch
         ? `You are Kanglei AI, a powerful artificial intelligence assistant founded by Rakesh Irom. 
 You have access to real-time web search capabilities to provide the most current and accurate information.
-Help users with their queries, research, coding, writing, analysis, and much more.
+Answer the user's exact question directly. Keep answers concise: usually 2-5 sentences or short bullet points. Do not add unrelated background, filler, or repeated disclaimers. If the question is ambiguous, ask one focused clarification instead of guessing.
 When the user asks about current events or recent information, use your search capabilities.`
         : `You are Kanglei AI, a powerful artificial intelligence assistant founded by Rakesh Irom.
 You are as capable as ChatGPT, Gemini, Claude, and Perplexity combined.
-Help users with their queries, research, coding, writing, analysis, creative tasks, and much more.`
+Answer the user's exact question directly. Keep answers concise: usually 2-5 sentences or short bullet points. Do not add unrelated background, filler, or repeated disclaimers. If the question is ambiguous, ask one focused clarification instead of guessing.`
     }
 
-    // Use Groq SDK directly for real responses
-    const result = await generateText({
-      model: groq(groqModel),
-      system: systemPrompt,
-      messages: messages.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-      temperature: 0.7,
-    })
+    // Try each configured key so one exhausted or revoked key does not break chat.
+    let result
+    let lastError: unknown
+
+    for (const apiKey of groqApiKeys) {
+      try {
+        result = await generateText({
+          model: groq(groqModel, { apiKey }),
+          system: systemPrompt,
+          messages: safeMessages.map((msg: any) => ({
+            role: msg.role,
+            content: msg.content,
+          })),
+          temperature: 0.7,
+        })
+        break
+      } catch (error) {
+        lastError = error
+        console.error('[v0] Groq key failed; trying next key:', error instanceof Error ? error.message : error)
+      }
+    }
+
+    if (!result) {
+      throw lastError ?? new Error('All Groq API keys failed')
+    }
 
     return Response.json({
       content: result.text,
@@ -89,8 +130,8 @@ Help users with their queries, research, coding, writing, analysis, creative tas
       console.error('[v0] API Key Issue - GROQ_API_KEY might not be set or invalid')
       return Response.json(
         { 
-          error: 'Groq API key not configured. Please add GROQ_API_KEY to your Vercel environment variables and redeploy.',
-          details: 'The application is ready, but needs your free Groq API key from console.groq.com'
+          error: 'All configured Groq API keys failed. Please check GROQ_API_KEY, GROQ_API_KEY_2, and GROQ_API_KEY_3.',
+          details: 'The server tried each configured Groq key and none could complete the request.'
         },
         { status: 500 }
       )

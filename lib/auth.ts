@@ -13,16 +13,22 @@ if (!process.env.BETTER_AUTH_SECRET) {
   console.warn('[v0] BETTER_AUTH_SECRET is not set - using fallback for development')
 }
 
+const normalizeBaseUrl = (value: string | undefined) => {
+  if (!value) return undefined
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`
+}
+
+const baseURL =
+  normalizeBaseUrl(process.env.BETTER_AUTH_URL) ??
+  normalizeBaseUrl(process.env.VERCEL_PROJECT_PRODUCTION_URL) ??
+  normalizeBaseUrl(process.env.VERCEL_URL) ??
+  normalizeBaseUrl(process.env.V0_RUNTIME_URL) ??
+  'http://localhost:3000'
+
 export const auth = betterAuth({
   database: pool,
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL:
-    process.env.BETTER_AUTH_URL ??
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.V0_RUNTIME_URL ?? 'http://localhost:3000'),
+  baseURL,
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,

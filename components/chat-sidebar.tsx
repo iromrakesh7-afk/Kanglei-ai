@@ -45,14 +45,14 @@ export function ChatSidebar({ conversations, onNewChat, user, isHeaderMenu }: Ch
 
   const sidebarContent = (
     <>
-      <div className="flex flex-col h-full bg-slate-900">
+      <div className="flex flex-col h-full bg-sidebar">
         {/* Header with Kanglei Branding */}
         <div className="p-4 border-b border-green-500/10 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-xs font-bold">K</span>
+          <div className="size-9 rounded-lg overflow-hidden bg-white flex items-center justify-center flex-shrink-0 border border-border">
+            <img src="/kanglei-new-logo.png" alt="Kanglei AI" className="size-full object-cover" />
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-sm font-semibold text-white truncate">Kanglei AI</h2>
+            <h2 className="text-sm font-semibold text-foreground truncate">Kanglei AI</h2>
             <p className="text-xs text-gray-400">by Rakesh Irom</p>
           </div>
         </div>
@@ -86,7 +86,7 @@ export function ChatSidebar({ conversations, onNewChat, user, isHeaderMenu }: Ch
                 className={`block px-3 py-2.5 rounded-lg text-sm transition-all truncate ${
                   pathname === `/chat/${conv.id}`
                     ? 'bg-green-500/15 text-green-300 font-medium'
-                    : 'text-gray-300 hover:bg-slate-800/50 hover:text-white'
+                    : 'text-gray-300 hover:bg-slate-800/50 hover:text-foreground'
                 }`}
                 title={conv.title}
               >
@@ -101,7 +101,7 @@ export function ChatSidebar({ conversations, onNewChat, user, isHeaderMenu }: Ch
           <Button
             onClick={() => setIsProfileOpen(true)}
             variant="ghost"
-            className="w-full text-gray-300 hover:text-white hover:bg-slate-800/50 text-sm rounded-lg py-2 px-3 flex items-center justify-start gap-3"
+            className="w-full text-gray-300 hover:text-foreground hover:bg-slate-800/50 text-sm rounded-lg py-2 px-3 flex items-center justify-start gap-3"
           >
             <User className="h-4 w-4" />
             <span>Profile</span>
@@ -126,7 +126,7 @@ export function ChatSidebar({ conversations, onNewChat, user, isHeaderMenu }: Ch
         {/* Mobile Menu Toggle Button - In Header */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden flex items-center gap-2 text-gray-400 hover:text-white p-2 rounded-lg transition-all"
+          className="lg:hidden flex items-center gap-2 text-gray-400 hover:text-foreground p-2 rounded-lg transition-all"
           aria-label={isOpen ? 'Close menu' : 'Open menu'}
         >
           {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -141,10 +141,10 @@ export function ChatSidebar({ conversations, onNewChat, user, isHeaderMenu }: Ch
               className="fixed inset-0 z-20 bg-black/50 backdrop-blur-sm"
             />
             {/* Sidebar Panel */}
-            <aside className="fixed left-0 top-0 z-30 bg-slate-900 border-r border-green-500/10 w-64 h-screen flex flex-col overflow-hidden">
+            <aside className="fixed left-0 top-0 z-30 bg-sidebar border-r border-green-500/10 w-64 h-screen flex flex-col overflow-hidden">
               <button
                 onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-white z-40 p-1 rounded-lg hover:bg-slate-800"
+                className="absolute top-4 right-4 text-gray-400 hover:text-foreground z-40 p-1 rounded-lg hover:bg-slate-800"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -168,7 +168,7 @@ export function ChatSidebar({ conversations, onNewChat, user, isHeaderMenu }: Ch
   return (
     <>
       {/* Desktop Sidebar - Gemini Style */}
-      <aside className="hidden lg:flex flex-col w-64 bg-slate-900 border-r border-green-500/10 h-screen flex-shrink-0">
+      <aside className="hidden lg:flex flex-col w-64 bg-sidebar border-r border-green-500/10 h-screen flex-shrink-0">
         {sidebarContent}
       </aside>
 
@@ -181,10 +181,10 @@ export function ChatSidebar({ conversations, onNewChat, user, isHeaderMenu }: Ch
             className="fixed inset-0 z-20 lg:hidden bg-black/50 backdrop-blur-sm"
           />
           {/* Sidebar Panel */}
-          <aside className="fixed left-0 top-0 z-30 lg:hidden bg-slate-900 border-r border-green-500/10 w-64 h-screen flex flex-col overflow-hidden">
+          <aside className="fixed left-0 top-0 z-30 lg:hidden bg-sidebar border-r border-green-500/10 w-64 h-screen flex flex-col overflow-hidden">
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white z-40 p-1 rounded-lg hover:bg-slate-800"
+              className="absolute top-4 right-4 text-gray-400 hover:text-foreground z-40 p-1 rounded-lg hover:bg-slate-800"
             >
               <X className="h-5 w-5" />
             </button>
