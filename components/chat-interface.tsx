@@ -425,10 +425,10 @@ export function ChatInterface({
       </div>
 
       {/* Modern Minimalist Input Area - Mobile Optimized */}
-      <div ref={inputAreaRef} className="border-t border-green-500/20 bg-slate-950 px-2 lg:px-6 py-2 lg:py-3 flex-shrink-0 transition-all duration-200 flex flex-col gap-2 lg:gap-3">
+      <div ref={inputAreaRef} className="border-t border-border bg-background px-2 lg:px-6 py-3 lg:py-4 flex-shrink-0 transition-all duration-200 flex flex-col gap-2 lg:gap-3">
         <div className="flex flex-col gap-2 lg:gap-3">
           {/* Input Container - Gemini Pro Style */}
-          <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-2.5 transition-all hover:border-white/40">
+          <div className="flex items-center gap-2 bg-card border border-border rounded-[1.75rem] px-3 py-2.5 shadow-sm transition-all focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20 hover:border-ring/60">
             {/* Left: Menu Dropdown */}
             <div className="relative">
               <button 
@@ -440,13 +440,13 @@ export function ChatInterface({
               </button>
 
               {showMenuDropdown && (
-                <div className="absolute bottom-full mb-2 left-0 bg-slate-900 border border-white/30 rounded-lg shadow-2xl z-50 min-w-max max-h-96 overflow-y-auto">
+                <div className="absolute bottom-full mb-2 left-0 bg-card border border-border rounded-xl shadow-lg z-50 min-w-max max-h-96 overflow-y-auto">
                   <button
                     onClick={() => {
                       handleNewChat()
                       setShowMenuDropdown(false)
                     }}
-                    className="block w-full text-left px-4 py-2 text-sm text-foreground/70 hover:bg-white/10 transition-all border-b border-white/10"
+                    className="block w-full text-left px-4 py-2 text-sm text-foreground/70 hover:bg-muted transition-all border-b border-white/10"
                   >
                     New Chat
                   </button>
@@ -461,7 +461,7 @@ export function ChatInterface({
                           onClick={() => {
                             window.location.href = `/chat/${chat.id}`
                           }}
-                          className="block w-full text-left px-4 py-2 text-xs text-foreground/60 hover:bg-white/10 transition-all truncate"
+                          className="block w-full text-left px-4 py-2 text-xs text-foreground/60 hover:bg-muted transition-all truncate"
                           title={chat.title}
                         >
                           {chat.title}
@@ -489,7 +489,7 @@ export function ChatInterface({
                       window.location.href = '/settings'
                       setShowMenuDropdown(false)
                     }}
-                    className={`block w-full text-left px-4 py-2 text-sm text-foreground/70 hover:bg-white/10 transition-all ${isAdmin ? '' : 'border-t border-white/10'}`}
+                    className={`block w-full text-left px-4 py-2 text-sm text-foreground/70 hover:bg-muted transition-all ${isAdmin ? '' : 'border-t border-white/10'}`}
                   >
                     Settings
                   </button>
@@ -501,7 +501,7 @@ export function ChatInterface({
             <div className="relative flex-shrink-0" ref={modelDropdownRef}>
               <button
                 onClick={() => setShowModelDropdown(!showModelDropdown)}
-                className="flex items-center gap-1 text-foreground/70 hover:text-foreground text-xs px-2 py-1 rounded-lg hover:bg-white/10 transition-all"
+                className="flex items-center gap-1 text-foreground/70 hover:text-foreground text-xs px-2 py-1 rounded-lg hover:bg-muted transition-all"
               >
                 <span className="truncate max-w-12">{selectedModelData?.name || 'K.AI'}</span>
                 <ChevronDown 
@@ -511,7 +511,7 @@ export function ChatInterface({
               </button>
 
               {showModelDropdown && (
-                <div className="absolute bottom-full mb-2 left-0 bg-slate-900 border border-white/30 rounded-lg shadow-2xl z-50 min-w-max">
+                <div className="absolute bottom-full mb-2 left-0 bg-card border border-border rounded-xl shadow-lg z-50 min-w-max">
                   {AVAILABLE_MODELS.map((m, idx) => (
                     <button
                       key={idx}
@@ -528,7 +528,7 @@ export function ChatInterface({
                           ? 'bg-slate-800 text-gray-500 opacity-60'
                           : selectedModel === m.id
                           ? 'bg-green-500/30 text-green-400 font-semibold'
-                          : 'text-foreground/70 hover:bg-white/10'
+                          : 'text-foreground/70 hover:bg-muted'
                       }`}
                     >
                       {m.name}
@@ -564,7 +564,7 @@ export function ChatInterface({
               }}
               placeholder="Ask Kanglei"
               disabled={loading}
-              className="flex-1 min-w-0 bg-transparent text-sm text-foreground placeholder-white/50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 min-w-0 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             />
 
             {/* Right: Send Button */}

@@ -96,7 +96,7 @@
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
     padding-bottom: env(safe-area-inset-bottom);
-    background: linear-gradient(180deg, #000000 0%, #080a18 40%, #12162D 100%);
+    background: var(--background);
     min-height: 100vh;
   }
   body {
