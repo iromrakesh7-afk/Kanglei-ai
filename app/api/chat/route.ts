@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
-    const { messages, model = 'groq/llama-3.3-70b-versatile', language = 'en', useSearch = false } = body
+    const { messages, model = 'groq/openai/gpt-oss-120b', language = 'en', useSearch = false } = body
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return Response.json({ error: 'Please ask a question before sending.' }, { status: 400 })
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     // Keep the provider model fixed and known-good instead of trusting client input.
-    const groqModel = 'llama-3.3-70b-versatile'
+    const groqModel = 'openai/gpt-oss-120b'
     console.log('[v0] Using Groq model:', groqModel)
     console.log('[v0] Language:', language)
     const groqApiKeys = [

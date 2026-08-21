@@ -47,7 +47,7 @@ export default async function ChatDetailPage({ params }: ChatPageProps) {
   const validModel = 
     conversation.model && conversation.model.startsWith('groq/') && !conversation.model.includes('mixtral') && !conversation.model.includes('llama-3.1') && !conversation.model.includes('llama-2')
       ? conversation.model
-      : 'groq/llama-3.3-70b-versatile'
+      : 'groq/openai/gpt-oss-120b'
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden max-h-screen">
