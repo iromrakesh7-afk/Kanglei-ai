@@ -36,7 +36,20 @@ export async function POST(req: Request) {
     const groqModel = 'llama-3.3-70b-versatile'
     console.log('[v0] Using Groq model:', groqModel)
     console.log('[v0] Language:', language)
-    console.log('[v0] GROQ_API_KEY is set:', !!process.env.GROQ_API_KEY)
+    const groqApiKeys = [
+      process.env.GROQ_API_KEY,
+      process.env.GROQ_API_KEY_2,
+      process.env.GROQ_API_KEY_3,
+    ].filter((key): key is string => Boolean(key?.trim()))
+
+    if (groqApiKeys.length === 0) {
+      return Response.json(
+        { error: 'No Groq API key is configured.' },
+        { status: 500 },
+      )
+    }
+
+    console.log('[v0] Groq API keys available:', groqApiKeys.length)
 
     let systemPrompt: string
 
@@ -71,16 +84,31 @@ You are as capable as ChatGPT, Gemini, Claude, and Perplexity combined.
 Help users with their queries, research, coding, writing, analysis, creative tasks, and much more.`
     }
 
-    // Use Groq SDK directly for real responses
-    const result = await generateText({
-      model: groq(groqModel),
-      system: systemPrompt,
-      messages: safeMessages.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-      temperature: 0.7,
-    })
+    // Try each configured key so one exhausted or revoked key does not break chat.
+    let result
+    let lastError: unknown
+
+    for (const apiKey of groqApiKeys) {
+      try {
+        result = await generateText({
+          model: groq(groqModel, { apiKey }),
+          system: systemPrompt,
+          messages: safeMessages.map((msg: any) => ({
+            role: msg.role,
+            content: msg.content,
+          })),
+          temperature: 0.7,
+        })
+        break
+      } catch (error) {
+        lastError = error
+        console.error('[v0] Groq key failed; trying next key:', error instanceof Error ? error.message : error)
+      }
+    }
+
+    if (!result) {
+      throw lastError ?? new Error('All Groq API keys failed')
+    }
 
     return Response.json({
       content: result.text,
@@ -102,8 +130,8 @@ Help users with their queries, research, coding, writing, analysis, creative tas
       console.error('[v0] API Key Issue - GROQ_API_KEY might not be set or invalid')
       return Response.json(
         { 
-          error: 'Groq API key not configured. Please add GROQ_API_KEY to your Vercel environment variables and redeploy.',
-          details: 'The application is ready, but needs your free Groq API key from console.groq.com'
+          error: 'All configured Groq API keys failed. Please check GROQ_API_KEY, GROQ_API_KEY_2, and GROQ_API_KEY_3.',
+          details: 'The server tried each configured Groq key and none could complete the request.'
         },
         { status: 500 }
       )
