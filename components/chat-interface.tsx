@@ -235,9 +235,11 @@ export function ChatInterface({
         }),
       })
 
-      if (!response.ok) throw new Error('Failed to get response')
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok || !data.content) {
+        throw new Error(data.error || 'I could not generate an answer right now. Please try again.')
+      }
 
-      const data = await response.json()
       const assistantMessage: Message = {
         role: 'assistant',
         content: data.content,
@@ -276,7 +278,9 @@ export function ChatInterface({
         ...newMessages,
         {
           role: 'assistant',
-          content: 'Sorry, I encountered an error. Please try again.',
+          content: error instanceof Error
+            ? error.message
+            : 'I could not generate an answer right now. Please try again.',
         },
       ])
       setIsAnswering(false)

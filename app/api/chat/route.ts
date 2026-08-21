@@ -13,14 +13,27 @@ export async function POST(req: Request) {
       return new Response('Unauthorized', { status: 401 })
     }
 
-    let { messages, model = 'groq/llama-3.3-70b-versatile', language = 'en', useSearch = false } = await req.json()
+    const body = await req.json()
+    const { messages, model = 'groq/llama-3.3-70b-versatile', language = 'en', useSearch = false } = body
 
-    if (!messages || !Array.isArray(messages)) {
-      return new Response('Invalid messages format', { status: 400 })
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return Response.json({ error: 'Please ask a question before sending.' }, { status: 400 })
     }
 
-    // Remove 'groq/' prefix if present
-    const groqModel = model.startsWith('groq/') ? model.replace('groq/', '') : model
+    const safeMessages = messages
+      .filter((msg: any) =>
+        (msg?.role === 'user' || msg?.role === 'assistant') &&
+        typeof msg?.content === 'string' &&
+        msg.content.trim().length > 0
+      )
+      .slice(-20)
+
+    if (safeMessages.length === 0 || !safeMessages.some((msg: any) => msg.role === 'user')) {
+      return Response.json({ error: 'Please enter a valid question.' }, { status: 400 })
+    }
+
+    // Keep the provider model fixed and known-good instead of trusting client input.
+    const groqModel = 'llama-3.3-70b-versatile'
     console.log('[v0] Using Groq model:', groqModel)
     console.log('[v0] Language:', language)
     console.log('[v0] GROQ_API_KEY is set:', !!process.env.GROQ_API_KEY)
@@ -62,7 +75,7 @@ Help users with their queries, research, coding, writing, analysis, creative tas
     const result = await generateText({
       model: groq(groqModel),
       system: systemPrompt,
-      messages: messages.map((msg: any) => ({
+      messages: safeMessages.map((msg: any) => ({
         role: msg.role,
         content: msg.content,
       })),
