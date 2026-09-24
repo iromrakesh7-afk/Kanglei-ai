@@ -10,8 +10,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Kanglei AI - Powered by Rakesh Irom',
-  description: 'Kanglei AI - A powerful AI assistant with capabilities like ChatGPT, Gemini, Claude, and Perplexity. Founded by Rakesh Irom.',
+  title: 'Kanglei AI — Intelligent. Responsive. Connected.',
+  description: 'Kanglei AI is a responsive AI assistant for conversations, creation, research, files, voice, and Manipuri-language interaction.',
   generator: 'v0.app',
   icons: {
     icon: '/kanglei-new-logo.png',
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#ffffff',
+  colorScheme: 'dark',
+  themeColor: '#000000',
   width: 'device-width',
   initialScale: 1,
   minimumScale: 1,
