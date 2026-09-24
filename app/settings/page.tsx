@@ -3,210 +3,96 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { LogOut, ArrowLeft, User, Mail, Phone, MapPin } from 'lucide-react'
+import { ArrowLeft, Bell, ChevronRight, CircleHelp, ClipboardList, Clock3, CreditCard, Database, Info, Languages, LayoutGrid, LifeBuoy, LogOut, LockKeyhole, Mail, Palette, PanelLeft, Phone, RefreshCw, ShieldCheck, SlidersHorizontal, Sparkles, Volume2, WalletCards, Wrench, Waves, X } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+
+type SettingItem = [string, string, string, LucideIcon]
+type SettingGroup = { title: string; items: SettingItem[] }
+
+const groups: SettingGroup[] = [
+  { title: 'Customize Kanglei AI', items: [
+    ['personalization', 'Personalization', 'Customize how Kanglei AI responds to you', Sparkles],
+    ['memory', 'Memory', 'Manage what Kanglei AI remembers', Database],
+    ['language', 'Language', 'English', Languages],
+    ['voice', 'Voice', 'Configure voice conversations', Volume2],
+  ]},
+  { title: 'Account', items: [
+    ['account', 'Email', 'rakeshirom@example.com', Mail],
+    ['subscription', 'Subscription', 'Free', CreditCard],
+    ['upgrade', 'Upgrade Plan', 'Unlock additional Kanglei AI features', WalletCards],
+    ['security', 'Login & Security', 'Manage account security', LockKeyhole],
+  ]},
+  { title: 'Appearance', items: [
+    ['appearance', 'Appearance', 'System', Palette],
+    ['accent', 'Accent Color', 'Blue', Waves],
+    ['theme', 'Chat Theme', 'Dark', LayoutGrid],
+  ]},
+  { title: 'App Settings', items: [
+    ['general', 'General', 'Configure general application behavior', SlidersHorizontal],
+    ['notifications', 'Notifications', 'Manage alerts and notifications', Bell],
+    ['storage', 'Storage', 'Manage application storage', Database],
+    ['data', 'Data Controls', 'Manage chat and account data', RefreshCw],
+    ['remote', 'Remote Control', 'Manage connected devices', PanelLeft],
+  ]},
+  { title: 'Help & Support', items: [
+    ['help', 'Help Center', 'Find answers and learn about Kanglei AI', CircleHelp],
+    ['privacy', 'Privacy Center', 'Understand your privacy choices', ShieldCheck],
+    ['about', 'About Kanglei AI', 'Intelligence from Manipur, built for the world', Info],
+    ['open-source', 'Open Source Licenses', 'Review third-party software notices', ClipboardList],
+    ['support', 'Contact Support', 'Get help with your account', LifeBuoy],
+  ]},
+]
+
+const detailCopy: Record<string, { title: string; description: string; rows: [string, string, 'toggle' | 'link'][] }> = {
+  personalization: { title: 'Personalization', description: 'Customize how Kanglei AI communicates with you.', rows: [['Response style', 'Balanced', 'link'], ['Tone', 'Friendly', 'link'], ['Use simple language', 'On', 'toggle'], ['Explain technical concepts', 'On', 'toggle'], ['Use examples', 'On', 'toggle'], ['Remember preferences', 'On', 'toggle']] },
+  memory: { title: 'Memory', description: 'Kanglei AI can use saved preferences to provide more relevant responses.', rows: [['Memory', 'On', 'toggle'], ['Use conversation history', 'On', 'toggle'], ['Show memory information', 'View saved memories', 'link'], ['Memory summary', 'Review', 'link'], ['Clear conversation history', 'Delete', 'link']] },
+  language: { title: 'Language', description: 'Choose how Kanglei AI speaks and displays information.', rows: [['App language', 'English', 'link'], ['Manipuri Chat', 'On', 'toggle'], ['Manipuri Speech Recognition', 'Off', 'toggle'], ['Manipuri Text-to-Speech', 'Off', 'toggle'], ['Meitei Mayek Support', 'On', 'toggle']] },
+  voice: { title: 'Voice', description: 'Configure natural voice conversations with Kanglei AI.', rows: [['Voice conversations', 'On', 'toggle'], ['Hands-free mode', 'Off', 'toggle'], ['Background conversations', 'Off', 'toggle'], ['Voice selection', 'KAI Voice 01', 'link'], ['Speaking speed', '1.0x', 'link']] },
+  general: { title: 'General', description: 'Configure general application behavior.', rows: [['Start new chat automatically', 'On', 'toggle'], ['Open last conversation', 'On', 'toggle'], ['Send messages with Enter', 'On', 'toggle'], ['Show message timestamps', 'Off', 'toggle'], ['Haptic feedback', 'On', 'toggle'], ['Animations', 'On', 'toggle'], ['Default response style', 'Balanced', 'link']] },
+  notifications: { title: 'Notifications', description: 'Choose which alerts Kanglei AI can send you.', rows: [['Push notifications', 'On', 'toggle'], ['Chat responses', 'On', 'toggle'], ['Voice notifications', 'Off', 'toggle'], ['Scheduled tasks', 'On', 'toggle'], ['Security alerts', 'On', 'toggle'], ['Product updates', 'Off', 'toggle'], ['Notification preview', 'When unlocked', 'link']] },
+  appearance: { title: 'Appearance', description: 'Make Kanglei AI feel at home on your device.', rows: [['Appearance', 'System', 'link'], ['Accent color', 'Blue', 'link'], ['Chat theme', 'Dark', 'link'], ['Font size', 'Default', 'link'], ['Reduce motion', 'Off', 'toggle']] },
+  security: { title: 'Security & Login', description: 'Keep your account protected across every device.', rows: [['Google Sign-In', 'Connected', 'link'], ['Email & Password', 'Manage', 'link'], ['Two-factor authentication', 'Off', 'toggle'], ['Login activity', 'Review', 'link'], ['Active sessions', '3 devices', 'link'], ['Biometric lock', 'Off', 'toggle']] },
+  data: { title: 'Data Controls', description: 'Manage your conversations and account data.', rows: [['Save chat history', 'On', 'toggle'], ['Use chat history', 'On', 'toggle'], ['Improve AI experience', 'On', 'toggle'], ['Download my data', 'Export', 'link'], ['Export conversations', 'Export', 'link'], ['Delete all conversations', 'Delete', 'link'], ['Delete account', 'Delete', 'link']] },
+}
 
 export default function SettingsPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('profile')
+  const [active, setActive] = useState('profile')
+  const [open, setOpen] = useState(false)
+  const [toggles, setToggles] = useState<Record<string, boolean>>({})
   const router = useRouter()
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/user')
-        if (!response.ok) {
-          router.push('/sign-in')
-          return
-        }
-        const data = await response.json()
-        setUser(data.user)
-      } catch (error) {
-        console.error('[v0] Error fetching user:', error)
-        router.push('/sign-in')
-      } finally {
-        setLoading(false)
-      }
-    }
-    checkAuth()
+    fetch('/api/user').then(async (response) => { if (!response.ok) { router.push('/sign-in'); return }; const data = await response.json(); setUser(data.user) }).catch(() => router.push('/sign-in')).finally(() => setLoading(false))
   }, [router])
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/signout', { method: 'POST' })
-      router.push('/sign-in')
-    } catch (error) {
-      console.error('[v0] Logout error:', error)
-    }
-  }
+  const toggle = (key: string) => setToggles((current) => ({ ...current, [key]: !(current[key] ?? true) }))
+  const logout = async () => { await fetch('/api/auth/signout', { method: 'POST' }); router.push('/sign-in') }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    )
-  }
+  if (loading) return <div className="flex min-h-screen items-center justify-center bg-black text-sm text-white/50">Loading your settings...</div>
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-slate-950" style={{
-      background: 'linear-gradient(180deg, #000000 0%, #080a18 40%, #12162D 100%)'
-    }}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 sm:px-4 py-3 border-b border-green-500/20 bg-black/80 sticky top-0 z-40">
-        <Link
-          href="/chat"
-          className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-        >
-          <ArrowLeft size={20} className="text-white" />
-        </Link>
-        <h1 className="text-lg sm:text-xl font-bold text-white flex-1 text-center">Settings</h1>
-        <div className="w-8"></div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 flex gap-0 sm:gap-4 px-3 sm:px-4 py-4 sm:py-6 overflow-y-auto">
-        {/* Vertical Tabs Navigation */}
-        <div className="flex flex-col gap-2 min-w-max">
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all rounded-lg border ${
-              activeTab === 'profile'
-                ? 'bg-green-500/20 text-green-400 border-green-500/50'
-                : 'text-gray-400 border-transparent hover:bg-white/5'
-            }`}
-          >
-            <User size={16} className="mr-2 inline" />
-            Profile
-          </button>
-          <button
-            onClick={() => setActiveTab('support')}
-            className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all rounded-lg border ${
-              activeTab === 'support'
-                ? 'bg-green-500/20 text-green-400 border-green-500/50'
-                : 'text-gray-400 border-transparent hover:bg-white/5'
-            }`}
-          >
-            <Mail size={16} className="mr-2 inline" />
-            Support
-          </button>
-        </div>
-
-        {/* Tab Content */}
-        <div className="flex-1 flex flex-col items-stretch gap-6 max-w-md w-full">
-          {/* Profile Tab */}
-          {activeTab === 'profile' && (
-            <>
-              <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
-                <h2 className="text-sm font-semibold text-green-400 uppercase mb-4">Profile Information</h2>
-
-                {user && (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-xs text-gray-500 uppercase">Email</label>
-                      <p className="text-white mt-1 break-all">{user.email}</p>
-                    </div>
-
-                    {user.name && (
-                      <div>
-                        <label className="text-xs text-gray-500 uppercase">Name</label>
-                        <p className="text-white mt-1">{user.name}</p>
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="text-xs text-gray-500 uppercase">User ID</label>
-                      <p className="text-white/60 text-xs mt-1 font-mono break-all">{user.id}</p>
-                    </div>
-
-                    <div>
-                      <label className="text-xs text-gray-500 uppercase">Joined</label>
-                      <p className="text-white mt-1">{new Date(user.createdAt).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
-                <h2 className="text-sm font-semibold text-green-400 uppercase mb-4">Account</h2>
-
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/30 rounded-lg transition-all font-medium"
-                >
-                  <LogOut size={18} />
-                  Sign Out
-                </button>
-              </div>
-            </>
-          )}
-
-          {/* Support Tab */}
-          {activeTab === 'support' && (
-            <>
-              <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
-                <h2 className="text-sm font-semibold text-green-400 uppercase mb-4">Contact Us</h2>
-
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase mb-2">Email</p>
-                    <a
-                      href="mailto:support@kangleiai.in"
-                      className="flex items-center gap-3 px-3 py-2.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg transition-all"
-                    >
-                      <Mail size={18} />
-                      <span>support@kangleiai.in</span>
-                    </a>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase mb-2">Phone</p>
-                    <a
-                      href="tel:+919863145283"
-                      className="flex items-center gap-3 px-3 py-2.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg transition-all"
-                    >
-                      <Phone size={18} />
-                      <span>+91 9863 145283</span>
-                    </a>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase mb-2">Location</p>
-                    <div className="flex items-center gap-3 px-3 py-2.5 bg-white/5 text-white border border-white/20 rounded-lg">
-                      <MapPin size={18} className="text-green-400" />
-                      <span>Manipur, India</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6">
-                <h2 className="text-sm font-semibold text-green-400 uppercase mb-4">Support Hours</h2>
-
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-white">Available 24/7</p>
-                    <p className="text-xs text-gray-500 mt-1">We&apos;re here to help you anytime</p>
-                  </div>
-
-                  <div className="pt-3 border-t border-white/10">
-                    <p className="text-xs text-gray-400">
-                      For technical support, feature requests, or any inquiries, feel free to reach out using the contact information above.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* App Info */}
-          <div className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6 text-center">
-            <h2 className="text-sm font-semibold text-green-400 uppercase mb-2">Kanglei AI</h2>
-            <p className="text-xs text-gray-500">Version 1.0.0</p>
-            <p className="text-xs text-gray-600 mt-2">Your personal AI assistant</p>
-          </div>
-        </div>
-      </div>
+  return <main className="min-h-screen bg-black text-white">
+    <header className="sticky top-0 z-30 border-b border-white/10 bg-black/85 px-4 py-4 backdrop-blur-xl sm:px-8"><div className="mx-auto flex max-w-7xl items-center justify-between"><div className="flex items-center gap-3"><Link href="/chat" aria-label="Back to chat" className="flex size-10 items-center justify-center rounded-full border border-white/10 text-white/70 hover:bg-white/10"><ArrowLeft /></Link><div><p className="text-[10px] font-bold uppercase tracking-[.22em] text-[#00d4ff]">Kanglei AI</p><h1 className="text-lg font-semibold">Settings</h1></div></div><button onClick={() => setOpen(!open)} aria-label="Toggle settings menu" className="rounded-full p-2 text-white/60 hover:bg-white/10 lg:hidden">{open ? <X /> : <PanelLeft />}</button></div></header>
+    <div className="mx-auto flex max-w-7xl gap-10 px-4 py-7 sm:px-8 lg:py-10">
+      <aside className={`${open ? 'fixed inset-x-4 top-20 z-20 block max-h-[calc(100vh-6rem)] overflow-y-auto rounded-3xl border border-white/10 bg-[#101011] p-4 shadow-2xl' : 'hidden'} w-full shrink-0 lg:sticky lg:top-28 lg:block lg:w-[290px] lg:self-start lg:bg-transparent lg:p-0 lg:shadow-none`}><div className="mb-7 px-2"><h2 className="text-xl font-semibold">Account settings</h2><p className="mt-2 text-sm leading-6 text-white/40">Manage your account, preferences, privacy, and support.</p></div><nav className="flex flex-col gap-6" aria-label="Settings sections">{groups.map((group) => <div key={group.title}><p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.18em] text-white/30">{group.title}</p><div className="flex flex-col gap-1">{group.items.map(([id, label, description, Icon]) => <button key={id} onClick={() => { setActive(id); setOpen(false) }} className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${active === id ? 'bg-white/10 text-white' : 'text-white/55 hover:bg-white/5 hover:text-white'}`}><Icon className={`size-[18px] shrink-0 ${active === id ? 'text-[#00d4ff]' : ''}`} /><span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{label}</span><span className="block truncate text-[11px] text-white/30">{description}</span></span><ChevronRight className="size-4 text-white/25" /></button>)}</div></div>)}</nav></aside>
+      <section className="min-w-0 max-w-3xl flex-1">
+        {active === 'profile' ? <><div className="mb-8"><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#00d4ff]">Intelligent. Responsive. Connected.</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Your Kanglei AI</h2></div><div className="rounded-3xl border border-white/10 bg-[#151516] p-5 sm:p-7"><div className="flex items-center gap-4"><div className="relative flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1a5c3a] to-[#00d4ff] text-2xl font-semibold text-black">{user?.name?.[0] || user?.email?.[0]?.toUpperCase() || 'K'}<button aria-label="Edit profile image" className="absolute -bottom-2 -right-2 flex size-7 items-center justify-center rounded-full border-4 border-[#151516] bg-[#007aff] text-xs">+</button></div><div><h3 className="text-lg font-semibold">{user?.name || 'Rakesh Irom'}</h3><p className="text-sm text-white/45">Account settings</p><p className="mt-1 text-xs text-white/30">Manage your Kanglei AI account</p></div></div><div className="mt-7 grid gap-3 sm:grid-cols-2"><div className="rounded-2xl bg-white/[.04] p-4"><p className="text-[10px] uppercase tracking-widest text-white/30">Email</p><p className="mt-2 break-all text-sm">{user?.email || 'rakeshirom@example.com'}</p></div><div className="rounded-2xl bg-white/[.04] p-4"><p className="text-[10px] uppercase tracking-widest text-white/30">Subscription</p><p className="mt-2 text-sm">Free plan</p></div></div></div><button onClick={logout} className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm font-medium text-red-300 hover:bg-red-400/15"><LogOut /> Sign out</button></> : detailCopy[active] ? <DetailPanel config={detailCopy[active]} toggles={toggles} toggle={toggle} /> : <InfoPanel active={active} />}
+      </section>
     </div>
-  )
+  </main>
 }
+
+function DetailPanel({ config, toggles, toggle }: { config: { title: string; description: string; rows: [string, string, 'toggle' | 'link'][] }; toggles: Record<string, boolean>; toggle: (key: string) => void }) { return <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#00d4ff]">Kanglei AI settings</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">{config.title}</h2><p className="mt-3 max-w-xl text-sm leading-6 text-white/45">{config.description}</p><div className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-[#151516]">{config.rows.map(([label, value, type], index) => { const key = `${config.title}-${label}`; const on = toggles[key] ?? value === 'On'; return <div key={label} className={`flex min-h-[74px] items-center gap-4 px-4 sm:px-6 ${index ? 'border-t border-white/[.07]' : ''}`}><span className="min-w-0 flex-1 text-sm font-medium">{label}</span>{type === 'toggle' ? <button role="switch" aria-checked={on} aria-label={label} onClick={() => toggle(key)} className={`relative h-7 w-12 rounded-full transition ${on ? 'bg-[#007aff]' : 'bg-white/15'}`}><span className={`absolute top-1 size-5 rounded-full bg-white shadow transition ${on ? 'left-6' : 'left-1'}`} /></button> : <button className="flex items-center gap-2 text-right text-sm text-white/40 hover:text-white">{value}<ChevronRight className="size-4" /></button>}</div> })}</div>{config.title === 'Voice' && <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#007aff] px-5 py-3 text-sm font-semibold hover:bg-[#1685ff]"><Waves /> Test Voice</button>}{config.title === 'Data Controls' && <p className="mt-4 text-xs text-red-300/70">Destructive actions require confirmation before they can be completed.</p>}</div> }
+
+function SupportPanel() { const items: { icon: LucideIcon; title: string; body: string; href?: string }[] = [{ icon: Clock3, title: 'Support Response Time', body: 'We aim to respond to support requests within 1–2 business days. Response times may vary depending on complexity and urgency.' }, { icon: Wrench, title: 'Technical & Account Help', body: 'Technical issues, account-related problems, and security concerns may require additional investigation.' }, { icon: ClipboardList, title: 'Help Us Help You', body: 'Include a clear description, relevant screenshots or error messages, and the email associated with your Kanglei AI account, if applicable.' }, { icon: Mail, title: 'Support Email', body: 'support@kangleiai.site', href: 'mailto:support@kangleiai.site' }, { icon: Phone, title: 'Phone Support', body: '9863765467', href: 'tel:9863765467' }] as const; return <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#00d4ff]">Kanglei AI settings</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Contact Support</h2><p className="mt-3 max-w-xl text-sm leading-6 text-white/45">Need help with Kanglei AI? Our support team is here to help with technical issues, account questions, feedback, and other concerns.</p><div className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-[#151516]">{items.map(({ icon: Icon, title, body, href }, index) => <div key={title} className={`flex gap-4 px-5 py-5 sm:px-6 ${index ? 'border-t border-white/[.07]' : ''}`}><div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[.03] text-[#00d4ff]"><Icon className="size-[18px]" strokeWidth={1.7} /></div><div className="min-w-0"><h3 className="text-sm font-medium">{title}</h3>{href ? <a href={href} className="mt-1 block text-sm text-[#5eb6ff] hover:underline">{body}</a> : <p className="mt-1 text-sm leading-6 text-white/45">{body}</p>}</div></div>)}</div></div> }
+
+function LegalPanel({ active }: { active: string }) { const panels: Record<string, { title: string; description: string; sections: { heading: string; body: string }[] }> = {
+  help: { title: 'Help Center', description: 'Welcome to the Kanglei AI Help Center. Find answers and learn how to get the most from Kanglei AI.', sections: [{ heading: 'What is Kanglei AI?', body: 'Kanglei AI is an AI-powered platform that provides conversational assistance, information support, productivity tools, and intelligent AI features through a simple and responsive interface.' }, { heading: 'How do I use Kanglei AI?', body: 'Simply open Kanglei AI, enter your question or request in the chat interface, and send it. You can interact with KAI naturally through text and, where supported, voice.' }, { heading: 'Can I communicate in Manipuri?', body: 'Yes. Kanglei AI is designed with support for Manipuri (Meiteilon) interaction as an important part of its development. Users can communicate with KAI in Manipuri where the feature is available.' }, { heading: 'Why is KAI not responding?', body: 'Check your internet connection and try sending your request again. If the problem continues, refresh the application or try again later.' }, { heading: 'How do I report a problem?', body: 'Use the support or feedback option available within Kanglei AI. Include a description of the issue and, when possible, the steps that caused the problem.' }, { heading: 'How can I provide feedback?', body: 'Your feedback helps improve Kanglei AI. You can report bugs, suggest features, share usability feedback, or tell us what you would like KAI to improve.' }, { heading: 'Is Kanglei AI always accurate?', body: 'AI-generated responses can sometimes contain mistakes or incomplete information. For important decisions, verify information using reliable and authoritative sources.' }, { heading: 'Account & Security', body: 'Protect your account credentials and never share passwords, verification codes, or sensitive account information with others. If you notice suspicious activity involving your account, contact Kanglei AI support as soon as possible.' }, { heading: 'Need More Help?', body: 'If your question is not answered here, contact the Kanglei AI support team through the official support channels available on the platform.' }] },
+  support: { title: 'Contact Support', description: 'Need help with Kanglei AI? Our support team is here to help with technical issues, account questions, feedback, and other concerns.', sections: [{ heading: 'How Can We Help?', body: 'Whether you are experiencing a problem or have an idea for improving Kanglei AI, we would like to hear from you.' }, { heading: 'General Support', body: 'For questions about using Kanglei AI, features, accounts, or general assistance, contact rakeshirom@kanglei.ai.' }, { heading: 'Technical Support', body: 'For website, application, AI response, voice, calling-agent, or integration issues, include your name, account email, problem description, what you were trying to do, device and browser information, screenshots, or error messages.' }, { heading: 'Report a Bug', body: 'Please include a clear description and the steps required to reproduce the issue. Suggested subject: Bug Report — [Feature Name].' }, { heading: 'Send Feedback', body: 'Send feature requests, product suggestions, user experience feedback, Manipuri-language improvement suggestions, AI response feedback, and integration ideas. Suggested subject: Kanglei AI Feedback.' }, { heading: 'Privacy & Data Requests', body: 'For personal information, privacy, data access, or deletion requests, use the official support email. Do not send passwords, authentication codes, payment credentials, or other sensitive information.' }, { heading: 'Before Contacting Support', body: 'Check your internet connection, refresh Kanglei AI, update your browser or app, sign out and back in, try another device, and review the Kanglei AI Help Center.' }, { heading: 'Support Response Time', body: 'We aim to respond within 1–2 business days. Response times may vary depending on complexity and urgency. Email: support@kangleiai.site. Phone: 9863765467.' }] },
+  privacy: { title: 'Privacy Policy', description: 'Last Updated: September 24, 2026', sections: [{ heading: 'Information We Collect', body: 'Depending on how you use Kanglei AI, we may process account information, prompts and conversations, uploaded files, images, feedback, voice recordings, transcripts, IP address, device and browser information, approximate location, logs, usage, diagnostic, and performance data.' }, { heading: 'How We Use Information', body: 'We use information to provide Kanglei AI, process AI requests, provide voice and calling services, maintain accounts, improve reliability, develop features, provide support, detect fraud and security threats, protect users, and comply with legal obligations.' }, { heading: 'AI Conversations', body: 'Prompts and submitted content may be processed to generate responses and, depending on settings, for security, troubleshooting, and service improvement. Do not submit passwords, financial credentials, highly sensitive personal information, or confidential information unless necessary.' }, { heading: 'Voice and Calling Data', body: 'Voice input, transcripts, call metadata, and related information may be processed to provide real-time voice and calling-agent features. You are responsible for obtaining legally required consent before recording another person’s communications.' }, { heading: 'Cookies and Similar Technologies', body: 'Our websites may use cookies, local storage, analytics, and similar mechanisms to keep services functioning, remember preferences, understand usage, improve performance, and detect security issues.' }, { heading: 'Information Sharing & Security', body: 'We may share information with service providers when necessary to operate Kanglei AI, or disclose it when required by law, to protect users, or during corporate transactions. We use reasonable technical and organizational safeguards, but no internet service guarantees absolute security.' }, { heading: 'Retention and Your Rights', body: 'We retain information as reasonably necessary for services, security, legal obligations, disputes, and agreements. Depending on applicable law, you may request access, correction, deletion, processing information, withdrawal of consent, restriction, objection, or portability.' }, { heading: 'Children, International Processing & Changes', body: 'Kanglei AI does not knowingly collect children’s information in violation of applicable law. Information may be processed in other countries with appropriate safeguards. We may update this policy and publish a revised Last Updated date.' }, { heading: 'Contact Us', body: 'For privacy questions or personal information requests, contact Kanglei AI through the official support channels.' }] },
+  'open-source': { title: 'Open Source Licenses', description: 'Kanglei AI is built using proprietary technology, third-party services, and open-source software.', sections: [{ heading: 'Our Open Source Commitment', body: 'Where required by applicable licenses, Kanglei AI provides copyright notices, license information, and attribution for open-source components used in our products. Components remain subject to their original licenses.' }, { heading: 'Third-Party Components', body: 'Depending on the version and platform, Kanglei AI may use open-source libraries for web development, mobile apps, interface components, artificial intelligence, networking, authentication, data processing, security, media processing, and cloud infrastructure.' }, { heading: 'License Types', body: 'Dependencies may be distributed under MIT, Apache License 2.0, BSD, ISC, GPL, LGPL, MPL, and other applicable licenses. The specific license controls each component’s use and distribution.' }, { heading: 'Attribution', body: 'Copyright notices and license texts for applicable components should be included with the relevant Kanglei AI product or made available through the source-code or legal-notices section.' }, { heading: 'Important Notice', body: 'The appearance of an open-source component does not mean it is owned by Kanglei AI. Third-party trademarks, copyrights, and project names remain the property of their respective owners.' }, { heading: 'License Information', body: 'For the complete and current dependency list and license texts, refer to the Open Source Notices included with the applicable Kanglei AI product or release.' }] },
+  about: { title: 'About Kanglei AI', description: 'Intelligence from Manipur, built for the world.', sections: [{ heading: 'Kanglei Artificial Intelligence (KAI)', body: 'Kanglei AI creates accessible, multilingual, responsive AI experiences for everyone.' }, { heading: 'Founder & CEO', body: 'Rakesh Irom' }] },
+ }; const panel = panels[active] || panels.about; return <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#00d4ff]">Kanglei AI settings</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">{panel.title}</h2><p className="mt-3 max-w-2xl text-sm leading-6 text-white/45">{panel.description}</p><div className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-[#151516]">{panel.sections.map(({ heading, body }, index) => <article key={heading} className={`p-5 sm:p-6 ${index ? 'border-t border-white/[.07]' : ''}`}><div className="flex gap-4"><div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[.03] text-[#00d4ff]"><Info className="size-[17px]" strokeWidth={1.7} /></div><div><h3 className="text-sm font-semibold">{heading}</h3><p className="mt-2 text-sm leading-7 text-white/50">{body}</p></div></div></article>)}</div></div> }
+
+function InfoPanel({ active }: { active: string }) { if (['help', 'support', 'privacy', 'about', 'open-source'].includes(active)) return <LegalPanel active={active} />; const content: Record<string, [string, string]> = { subscription: ['Subscription', 'You are currently using the Free plan. Upgrade to unlock additional Kanglei AI features.'], upgrade: ['Upgrade Plan', 'Unlock higher limits, advanced voice conversations, and more powerful tools with Kanglei AI.'], storage: ['Storage', 'Kanglei AI Storage · 2.4 GB used'], remote: ['Remote Control', 'Manage Kanglei AI sessions across your devices. iPhone, Mac, and Web Browser are active.'], help: ['Help Center', 'Welcome to the Kanglei AI Help Center. Find answers about getting started, Manipuri support, account security, and common questions.'], privacy: ['Privacy Center', 'Privacy and responsible use of technology are essential to building trustworthy AI. Review your data choices and how conversations are handled.'], about: ['About Kanglei AI', 'Kanglei AI is intelligence from Manipur, built for the world. Founded by Rakesh Irom, KAI creates accessible, multilingual, responsive AI experiences.'], support: ['Contact Support', 'Need help with Kanglei AI? Contact support@kangleiai.site for technical issues, account questions, feedback, and feature requests.'], account: ['Account', 'Your email, account identity, and membership details are managed securely here.'], accent: ['Accent Color', 'Blue is your current accent color. Choose from Blue, Green, Gold, Purple, Orange, or Pink.'], theme: ['Chat Theme', 'Dark mode is enabled for a focused, iOS-inspired Kanglei AI experience.'] }; const [title, description] = content[active] || ['Settings', 'Manage your Kanglei AI preferences.']; return <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#00d4ff]">Kanglei AI settings</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">{title}</h2><div className="mt-8 rounded-3xl border border-white/10 bg-[#151516] p-6 sm:p-8"><p className="text-base leading-7 text-white/70">{description}</p>{active === 'storage' && <div className="mt-7"><div className="mb-2 flex justify-between text-xs text-white/45"><span>Storage used</span><span>24%</span></div><div className="h-2 rounded-full bg-white/10"><div className="h-2 w-1/4 rounded-full bg-[#007aff]" /></div></div>}{active === 'help' && <div className="mt-7 flex flex-col gap-3"><p className="text-sm font-medium">Common questions</p><p className="text-sm text-white/45">Why isn&apos;t KAI responding? Check your connection and try again.</p><p className="text-sm text-white/45">Can I communicate in Manipuri? Yes, where the feature is available.</p></div>}</div></div> }
