@@ -41,7 +41,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
       const code = typeof err === 'object' && err && 'code' in err ? String(err.code) : ''
       const errorMessage =
         code === 'auth/unauthorized-domain'
-          ? `This sign-in domain is not authorized in Firebase. Add ${window.location.hostname} under Firebase Console → Authentication → Settings → Authorized domains, then try again.`
+          ? `Firebase rejected this hostname: ${window.location.hostname}. In Firebase Console → Authentication → Settings → Authorized domains, add only this hostname (without https://, paths, or /__/auth/handler): ${window.location.hostname}. Also keep kanglei-ai-31b3c.firebaseapp.com authorized, then reload this page and try again.`
           : code === 'auth/popup-blocked'
             ? 'Your browser blocked the Google sign-in popup. Allow popups for this site and try again.'
             : code === 'auth/popup-closed-by-user'
