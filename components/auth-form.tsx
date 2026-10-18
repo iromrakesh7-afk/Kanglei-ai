@@ -3,7 +3,14 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { authClient } from '@/lib/auth-client'
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  updateProfile,
+} from 'firebase/auth'
+import { firebaseAuth } from '@/lib/firebase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -25,12 +32,12 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     setLoading(true)
 
     try {
-      console.log('[v0] Starting Google OAuth')
-      await authClient.signIn.oauth2({
-        provider: 'google',
-      })
+      console.log('[v0] Starting Firebase Google sign-in')
+      const provider = new GoogleAuthProvider()
+      await signInWithPopup(firebaseAuth, provider)
+      router.push('/chat')
     } catch (err) {
-      console.error('[v0] Google OAuth error:', err)
+      console.error('[v0] Firebase Google sign-in error:', err)
       setLoading(false)
       const errorMessage = err instanceof Error ? err.message : 'Google sign-in failed'
       setError(errorMessage)
@@ -70,39 +77,29 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     }
 
     try {
-      console.log('[v0] Starting auth request:', { isSignUp, email })
-      
-      const result = isSignUp
-        ? await authClient.signUp.email({ email, password, name })
-        : await authClient.signIn.email({ email, password })
+      console.log('[v0] Starting Firebase auth request:', { isSignUp, email })
 
-      console.log('[v0] Auth response:', result)
-
-      if (result.error) {
-        console.error('[v0] Auth error:', result.error)
-        let errorMessage = result.error.message ?? 'Authentication failed'
-        
-        // Provide better error messages
-        if (errorMessage.includes('Invalid') || errorMessage.includes('invalid')) {
-          if (isSignUp) {
-            errorMessage = 'Unable to create account. Please check your email and password.'
-          } else {
-            errorMessage = 'Email or password is incorrect. Please try again.'
-          }
-        }
-        
-        setError(errorMessage)
-        setLoading(false)
-        return
+      if (isSignUp) {
+        const credential = await createUserWithEmailAndPassword(firebaseAuth, email, password)
+        await updateProfile(credential.user, { displayName: name })
+      } else {
+        await signInWithEmailAndPassword(firebaseAuth, email, password)
       }
 
-      console.log('[v0] Auth successful, redirecting to /chat')
-      // Redirect immediately after successful auth
+      console.log('[v0] Firebase auth successful, redirecting to /chat')
       router.push('/chat')
     } catch (err) {
-      console.error('[v0] Auth exception:', err)
+      console.error('[v0] Firebase auth exception:', err)
       setLoading(false)
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred'
+      const code = typeof err === 'object' && err && 'code' in err ? String(err.code) : ''
+      const errorMessage =
+        code === 'auth/email-already-in-use'
+          ? 'An account already exists with this email.'
+          : code === 'auth/invalid-credential'
+            ? 'Email or password is incorrect. Please try again.'
+            : err instanceof Error
+              ? err.message
+              : 'An unexpected error occurred'
       setError(errorMessage)
     }
   }

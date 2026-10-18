@@ -2,6 +2,7 @@
 
 import { getAnalytics, isSupported, type Analytics } from 'firebase/analytics'
 import { getApps, initializeApp } from 'firebase/app'
+import { getAuth } from 'firebase/auth'
 
 export const firebaseAuthHandlerUrl = 'https://kanglei-ai-31b3c.firebaseapp.com/__/auth/handler'
 
@@ -16,6 +17,7 @@ const firebaseConfig = {
 }
 
 export const firebaseApp = getApps().length ? getApps()[0] : initializeApp(firebaseConfig)
+export const firebaseAuth = getAuth(firebaseApp)
 
 export async function getFirebaseAnalytics(): Promise<Analytics | null> {
   if (!firebaseConfig.apiKey || !(await isSupported())) return null
