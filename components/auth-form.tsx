@@ -32,14 +32,25 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     setLoading(true)
 
     try {
-      console.log('[v0] Starting Firebase Google sign-in')
       const provider = new GoogleAuthProvider()
+      provider.setCustomParameters({ prompt: 'select_account' })
       await signInWithPopup(firebaseAuth, provider)
       router.push('/chat')
     } catch (err) {
-      console.error('[v0] Firebase Google sign-in error:', err)
       setLoading(false)
-      const errorMessage = err instanceof Error ? err.message : 'Google sign-in failed'
+      const code = typeof err === 'object' && err && 'code' in err ? String(err.code) : ''
+      const errorMessage =
+        code === 'auth/unauthorized-domain'
+          ? `This sign-in domain is not authorized in Firebase. Add ${window.location.hostname} under Firebase Console → Authentication → Settings → Authorized domains, then try again.`
+          : code === 'auth/popup-blocked'
+            ? 'Your browser blocked the Google sign-in popup. Allow popups for this site and try again.'
+            : code === 'auth/popup-closed-by-user'
+              ? 'The Google sign-in window was closed before authentication completed.'
+              : code === 'auth/account-exists-with-different-credential'
+                ? 'An account already exists with this email using a different sign-in method.'
+                : err instanceof Error
+                  ? err.message
+                  : 'Google sign-in failed'
       setError(errorMessage)
     }
   }
