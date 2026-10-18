@@ -3,6 +3,8 @@
 import { getAnalytics, isSupported, type Analytics } from 'firebase/analytics'
 import { getApps, initializeApp } from 'firebase/app'
 
+export const firebaseAuthHandlerUrl = 'https://kanglei-ai-31b3c.firebaseapp.com/__/auth/handler'
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? process.env.apiKey,
   authDomain: 'kanglei-ai-31b3c.firebaseapp.com',
