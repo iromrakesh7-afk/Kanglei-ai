@@ -4,7 +4,7 @@ const isProtectedRoute = createRouteMatcher(['/chat(.*)', '/settings(.*)', '/adm
 
 export default clerkMiddleware(
   async (auth, request) => {
-    if (isProtectedRoute(request)) {
+    if (request?.nextUrl && isProtectedRoute(request)) {
       await auth.protect()
     }
   },
