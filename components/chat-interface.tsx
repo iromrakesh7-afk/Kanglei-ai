@@ -311,7 +311,7 @@ export function ChatInterface({
             <div className="flex flex-col items-center gap-2 md:gap-4">
               <div className="w-16 h-16 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-green-500 flex items-center justify-center bg-slate-900 flex-shrink-0">
                 <Image
-                  src="/kanglei-logo.png"
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202026-10-04%20at%2000.31.40-jWNELLSnxcEefKENhu1RZhAdStJrf6.jpeg"
                   alt="Kanglei AI Logo"
                   width={128}
                   height={128}
@@ -360,7 +360,7 @@ export function ChatInterface({
                   isAnswering && idx === messages.length - 1 ? 'animate-spin' : ''
                 }`}>
                   <Image
-                    src="/kanglei-logo.png"
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202026-10-04%20at%2000.31.40-jWNELLSnxcEefKENhu1RZhAdStJrf6.jpeg"
                     alt="Kanglei"
                     width={32}
                     height={32}
@@ -405,7 +405,7 @@ export function ChatInterface({
             <div className="flex-shrink-0 mt-1 hidden sm:block">
               <div className="w-6 h-6 md:w-8 md:h-8 rounded-full overflow-hidden flex items-center justify-center border-2 border-green-500 animate-spin">
                 <Image
-                  src="/kanglei-logo.png"
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202026-10-04%20at%2000.31.40-jWNELLSnxcEefKENhu1RZhAdStJrf6.jpeg"
                   alt="Kanglei"
                   width={32}
                   height={32}

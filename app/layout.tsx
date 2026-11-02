@@ -14,13 +14,13 @@ export const metadata: Metadata = {
   description: 'Kanglei AI - A powerful AI assistant with capabilities like ChatGPT, Gemini, Claude, and Perplexity. Founded by Rakesh Irom.',
   generator: 'v0.app',
   icons: {
-    icon: '/logo.png',
-    apple: '/logo.png',
+    icon: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202026-10-04%20at%2000.31.40-jWNELLSnxcEefKENhu1RZhAdStJrf6.jpeg',
+    apple: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202026-10-04%20at%2000.31.40-jWNELLSnxcEefKENhu1RZhAdStJrf6.jpeg',
   },
   openGraph: {
     title: 'Kanglei AI',
     description: 'Advanced AI Assistant founded by Rakesh Irom',
-    images: ['/logo.png'],
+    images: ['https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202026-10-04%20at%2000.31.40-jWNELLSnxcEefKENhu1RZhAdStJrf6.jpeg'],
   },
   verification: {
     google: 'iLWebto6sxDCoc54ur6bgvQUcbYG3K1Gp0lQ9gD5Xbk',

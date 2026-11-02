@@ -27,7 +27,7 @@ export function ComingSoonPopup({ isOpen, onClose }: ComingSoonPopupProps) {
         <div className="flex justify-center mb-4">
           <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-blue-400 flex items-center justify-center bg-white">
             <Image
-              src="/kanglei-logo.png"
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202026-10-04%20at%2000.31.40-jWNELLSnxcEefKENhu1RZhAdStJrf6.jpeg"
               alt="Kanglei AI Logo"
               width={80}
               height={80}

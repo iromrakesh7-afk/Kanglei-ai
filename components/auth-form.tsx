@@ -113,7 +113,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     <main className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
       <Card className="w-full max-w-sm p-8 bg-slate-900 border-green-500 border-2">
         <div className="flex justify-center mb-6">
-          <img src="/kanglei-logo.png" alt="Kanglei AI" className="h-16 w-16" />
+          <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202026-10-04%20at%2000.31.40-jWNELLSnxcEefKENhu1RZhAdStJrf6.jpeg" alt="Kanglei AI" className="h-16 w-16" />
         </div>
         <div className="mb-6 text-center">
           <h1 className="text-3xl font-bold tracking-tight text-white">
