@@ -1,10 +1,14 @@
-import { AuthForm } from '@/components/auth-form'
+import { SignUp } from '@clerk/nextjs'
 
 export const metadata = {
   title: 'Sign Up - Kanglei AI',
-  description: 'Create your account on Kanglei AI founded by Rakesh Irom',
+  description: 'Create your Kanglei AI account',
 }
 
 export default function SignUpPage() {
-  return <AuthForm mode="sign-up" />
+  return (
+    <main className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+      <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" />
+    </main>
+  )
 }

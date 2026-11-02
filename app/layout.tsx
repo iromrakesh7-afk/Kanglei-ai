@@ -1,4 +1,5 @@
 import { Analytics } from '@vercel/analytics/next'
+import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
@@ -76,7 +77,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased bg-slate-950 text-white">
-        {children}
+        <ClerkProvider>
+          {children}
+        </ClerkProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
