@@ -1,6 +1,7 @@
 import { clerkMiddleware } from '@clerk/nextjs/server'
 
 export default clerkMiddleware(
+  async () => {},
   {
     publishableKey:
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ??
