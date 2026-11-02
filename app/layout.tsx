@@ -77,7 +77,12 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased bg-slate-950 text-white">
-        <ClerkProvider>
+        <ClerkProvider
+          publishableKey={
+            process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ??
+            'pk_test_d2VsY29tZWQtYnVycm8tMjI4NS5jbGVyay5hY2NvdW50cy5kZXYk'
+          }
+        >
           {children}
         </ClerkProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
